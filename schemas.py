@@ -11,7 +11,7 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 
 # Example schemas (replace with your own):
@@ -22,7 +22,7 @@ class User(BaseModel):
     Collection name: "user" (lowercase of class name)
     """
     name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
+    email: EmailStr = Field(..., description="Email address")
     address: str = Field(..., description="Address")
     age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
     is_active: bool = Field(True, description="Whether user is active")
@@ -38,11 +38,19 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
-
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+# Marketing site lead capture schema
+class Lead(BaseModel):
+    """
+    Leads captured from the marketing website
+    Collection name: "lead"
+    """
+    name: str = Field(..., min_length=2, max_length=80, description="Prospect full name")
+    email: EmailStr = Field(..., description="Prospect email")
+    company: Optional[str] = Field(None, max_length=120, description="Company name")
+    service: Optional[str] = Field(
+        None,
+        description="Primary service of interest: ads, seo, linkedin, ghostwriting, design, ai"
+    )
+    budget: Optional[str] = Field(None, description="Approximate monthly budget range")
+    message: Optional[str] = Field(None, max_length=2000, description="Free-form message from lead")
+    source: Optional[str] = Field("website", description="Acquisition source tag")
